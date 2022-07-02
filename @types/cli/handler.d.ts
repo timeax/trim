@@ -1,0 +1,32 @@
+import { Default } from "@timeax/utilities";
+import { TrimRule } from "../../@types/globals";
+import { Trim } from "..";
+export declare class Actions extends Default {
+    private command;
+    private includes;
+    private excludes;
+    private compileables;
+    private _config;
+    get config(): TrimRule.TrimConfig;
+    set config(value: TrimRule.TrimConfig);
+    constructor(props?: any);
+    private _path;
+    get path(): string;
+    set path(value: string);
+    private _settings;
+    get settings(): TrimRule.TrimConfig;
+    createConfig(path: string): void;
+    runFile(from: string, to: string): void;
+    watchFolder(path: string): void;
+    get hasConfig(): boolean;
+    get stamp(): string;
+    findImports(compilers: Array<Trim>, path: string, store?: TrimRule.Imports[], search?: TrimRule.Imports): void;
+    findAssets(compilers: Array<Trim>, path: string, store?: TrimRule.Program[], search?: TrimRule.Program): void;
+    clear(): void;
+    compileFolder(compilers: Trim[], path?: string, type?: 'add' | 'change' | 'delete' | 'initial'): void;
+    onDelete(path: string, compilers: Trim[]): void;
+    isPage(path: string): boolean;
+    onChange(path: string, compilers: Trim[]): void;
+    set msg(value: string);
+    set xcache(value: string);
+}

@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "rules": {
+            "default": {},
+            "userDefined": []
+        },
+        "outDir": "",
+        "outFile": "",
+        "compileExtension": ".html",
+        "extensionPrefix": ""
+    },
+
+    "exclude": [],
+    "include": []
+}

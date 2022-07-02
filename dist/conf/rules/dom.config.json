@@ -1,0 +1,7 @@
+[
+    {
+        "name": "text",
+        "isBlock": true,
+        "path": "./assets/compilers/text"
+    }
+]

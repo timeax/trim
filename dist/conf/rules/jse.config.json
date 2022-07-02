@@ -1,0 +1,80 @@
+[
+    {
+        "name": "fragment",
+        "path": "../../components/jse/rules/fragment",
+        "isBlock": true,
+        "loader": true
+    },
+    {
+        "name": "export",
+        "path": "../../components/jse/rules/exports",
+        "isBlock": true
+    },
+    {
+        "name": "use",
+        "path": "../../components/jse/rules/use",
+        "isBlock": false,
+        "loader": true
+    },
+    {
+        "name": "import",
+        "path": "../../components/jse/rules/import",
+        "isBlock": false,
+        "loader": true
+    },
+    {
+        "name": "include",
+        "path": "../../components/jse/rules/include",
+        "isBlock": false,
+        "loader": true
+    },
+    {
+        "name": "condition",
+        "path": "../../components/jse/rules/conditionals",
+        "isBlock": true
+    },
+    {
+        "name": "if",
+        "path": "../../components/jse/rules/conditionals",
+        "isBlock": true
+    },
+    {
+        "name": "else",
+        "path": "../../components/jse/rules/conditionals",
+        "isBlock": true
+    },
+    {
+        "name": "else if",
+        "path": "../../components/jse/rules/conditionals",
+        "isBlock": true
+    },
+    {
+        "name": "each",
+        "path": "../../components/jse/rules/loops",
+        "isBlock": true
+    },
+    {
+        "name": "content",
+        "path": "../../components/jse/rules/Component",
+        "isBlock": false,
+        "isSetter": true
+    },
+    {
+        "name": "scraps",
+        "path": "../../components/jse/rules/scraps",
+        "isBlock": true,
+        "loader": true
+    },
+    {
+        "name": "props",
+        "path": "../../components/jse/rules/props",
+        "isBlock": false,
+        "isSetter": true
+    },
+    {
+        "name": "studio",
+        "path": "../../components/jse/rules/props",
+        "isBlock": false,
+        "isSetter": true
+    }
+]
