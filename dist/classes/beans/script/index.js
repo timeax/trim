@@ -24,8 +24,10 @@ class Script extends element_1.Element {
         return super.isClosed;
     }
     set isClosed(value) {
-        if (value && linter_1.default.lintText(this.value))
+        const { valid, msg } = linter_1.default.lintText(this.value);
+        if (value && valid)
             super.isClosed = value;
+        console.log(msg.message);
     }
 }
 exports.Script = Script;

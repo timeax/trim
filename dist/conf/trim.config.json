@@ -4,12 +4,19 @@
             "default": {},
             "userDefined": []
         },
+        "allowHTM": false,
         "outDir": "",
         "outFile": "",
         "compileExtension": ".html",
-        "extensionPrefix": ""
+        "extensionPrefix": "",
+        "allowNullValues": false,
+        "langOptions": {
+            "name": "",
+            "begin": "<?php",
+            "end": "?>"
+        }
     },
-
+    "useAlpine": true,
     "exclude": [],
     "include": []
 }

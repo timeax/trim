@@ -1,4 +1,5 @@
 import { Linter } from "eslint";
-export default function parseJsx(src: string, linter?: Linter): {
+import { TrimRule } from "../../../../../@types/globals";
+export default function parseJsx(src: string, linter: Linter, options: TrimRule.JSXOptions): {
     verify(): string;
 };

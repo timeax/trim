@@ -6,10 +6,10 @@ function extractExp(src, linter = new eslint_1.Linter()) {
     let result = [];
     linter.defineRule('getVars', {
         meta: {
-            type: 'problem',
+            type: 'layout',
             fixable: 'whitespace',
             docs: {
-                description: 'Rename all global variables.',
+                description: 'Extract all global variables.',
                 category: 'Possible Errors'
             },
             schema: [],
@@ -60,6 +60,11 @@ function expressionLinter(source, linter = new eslint_1.Linter()) {
             schema: [],
         },
         create: (context) => {
+            function getName(args) {
+                if (args.startsWith('global'))
+                    return args;
+                return `_$.${args}`;
+            }
             function loadExpressions(node, store = []) {
                 let refracted = [];
                 let item;
@@ -70,7 +75,7 @@ function expressionLinter(source, linter = new eslint_1.Linter()) {
                             props: {
                                 useRange: false,
                                 node: node,
-                                text: `_$.${node.name}`,
+                                text: getName(node.name),
                                 //@ts-ignore
                                 range: [node.start, node.end]
                             }
@@ -101,10 +106,11 @@ function expressionLinter(source, linter = new eslint_1.Linter()) {
                         item = getRoot(node, 'MemberExpression', 'object');
                         return loadExpressions(item, store);
                     case 'CallExpression':
-                        item = getRoot(node, 'CallExpression', 'callee');
+                        item = node.callee;
                         //@ts-ignore
                         node.arguments.forEach(arg => loadExpressions(arg, store));
-                        return loadExpressions(item, store);
+                        loadExpressions(item, store);
+                        break;
                     case 'TemplateLiteral':
                     case 'SequenceExpression':
                         for (const obj of node.expressions) {

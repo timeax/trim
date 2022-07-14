@@ -9,6 +9,7 @@ class ComponentBase extends _1.Program {
         super(props);
         this.sourceType = 'Export';
         this.isStrict = true;
+        this.isDefault = false;
         this.scriptEngine = new scriptEngine_1.ScriptEngine(this);
     }
     get ref() {
@@ -16,6 +17,9 @@ class ComponentBase extends _1.Program {
     }
     set ref(value) {
         this._ref = value;
+    }
+    set exportClose(value) {
+        throw new Error('Method not implemented.');
     }
     init() {
         super.init();

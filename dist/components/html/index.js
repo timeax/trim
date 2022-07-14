@@ -85,7 +85,7 @@ class HTML extends index_1.HTMLBase {
         const exp = this.sourceParent.imports.filter(item => item.sourceType === 'Export');
         const component = exp === null || exp === void 0 ? void 0 : exp.find(item => item.ref === this.name);
         if ((0, utilities_1.is)(component).null)
-            throw `Counld not find component with name '${this.name}'`;
+            this.throw(`Counld not find component with name '${this.name}'`, 'ComponentNotFound');
         if (component.exportType == 'normal') {
             this.attributes.forEach(item => item.compile());
             component.props = this.attributes;

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JsE = void 0;
+const utilities_1 = require("@timeax/utilities");
 const beans_1 = require("../../classes/beans");
 const jse_1 = require("../../classes/beans/jse");
 const extract_1 = require("../../classes/util/extract");
@@ -15,6 +16,11 @@ class JsE extends jse_1.JsEBase {
         if (this.sourceType == 'expression') {
             let result = (0, extract_1._call)(this.sourceParent.globals, this.value);
             // console.log(result)
+            if (!this.sourceParent.trim.config.compilerOptions.allowNullValues) {
+                if ((0, utilities_1.is)(result).null)
+                    return '';
+            }
+            //---
             this.raw = result;
             this.compiledText = this.compileResult(result);
         }

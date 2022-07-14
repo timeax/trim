@@ -14,7 +14,7 @@ class Page extends Page_1.PageBase {
         //@ts-ignore
         const { outFile, outDir, extensionPrefix, compileExtension } = !(0, utilities_1.is)(obj).null ? obj : {};
         if ((0, utilities_1.isEmpty)(outFile) && (0, utilities_1.isEmpty)(outDir))
-            return console.log(this.compiledText);
+            return console.log(this.compiledText, '-----');
         if ((0, utilities_1.isEmpty)(outDir)) {
             utilities_1.Fs.write(outFile, this.compiledText);
         }

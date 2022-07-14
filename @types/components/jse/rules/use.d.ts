@@ -4,6 +4,7 @@ export default class Use extends Compiler {
     imports: {
         local: string;
         name: string;
+        default: boolean;
     }[];
     constructor(props: any);
     run(param?: string[]): void;

@@ -7,6 +7,7 @@ export declare class Actions extends Default {
     private excludes;
     private compileables;
     private _config;
+    private watcher;
     get config(): TrimRule.TrimConfig;
     set config(value: TrimRule.TrimConfig);
     constructor(props?: any);

@@ -28,6 +28,7 @@ export declare class TrimBaseClass extends Default {
     private _line;
     get line(): number;
     set line(value: number);
+    createElement(value: Rule.NodeTypes): Rule.Tags;
     private _column;
     get column(): number;
     set column(value: number);
@@ -58,11 +59,11 @@ export declare class TrimBaseClass extends Default {
     private _classes;
     get classes(): Array<{
         name: Rule.Node['type'];
-        type: Rule.Node;
+        type: Rule.Tags;
     }>;
     set classes(value: Array<{
         name: Rule.Node['type'];
-        type: Rule.Node;
+        type: Rule.Tags;
     }>);
     private _lookout;
     get lookout(): boolean;
@@ -92,9 +93,9 @@ export declare class TrimBaseClass extends Default {
     parseName(path: string): Rule.Program['sourceType'];
     getProgram(name: Rule.Program['sourceType']): typeof Program;
     handle(char: string, prevChar?: string): boolean;
+    finaliseNode(char: string, current?: any): boolean;
     charTracker(char: string, ignore?: boolean): void;
     parseChar(char: string): void;
-    htmlClose(char: string): boolean;
     parseCurrent(text: string): boolean;
     parseJsE(char: string, ignore?: any, element?: any): void;
     ignoreNext(char: string, prev?: string): boolean;

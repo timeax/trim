@@ -68,7 +68,7 @@ class Loops extends _1.Compiler {
             }
         }
         else
-            throw `'${this.arr.substring(3, this.arr.length)}' is not iterable`;
+            throw TypeError(`'${this.arr.substring(3, this.arr.length)}' is not iterable`);
         return this.rule.compiledText;
     }
 }

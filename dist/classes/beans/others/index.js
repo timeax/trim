@@ -7,7 +7,15 @@ class Comment extends element_1.Element {
         super(props);
         this.value = '';
         this.type = 'Comment';
+        this.closeComment = false;
         this.isSet = true;
+    }
+    get commentType() {
+        return this._commentType;
+    }
+    set commentType(value) {
+        this._commentType = value;
+        this.loc.source = value == 'inline' ? '//' : '/*';
     }
 }
 exports.Comment = Comment;

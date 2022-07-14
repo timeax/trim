@@ -29,10 +29,10 @@ class TextNode extends element_1.Element {
         }
     }
     compile() {
-        var _a, _b;
+        var _a, _b, _c;
         if ((0, utilities_1.is)(this.parent).null)
             return this.value.trim();
-        const ref = ((_a = this.parent) === null || _a === void 0 ? void 0 : _a.type) == 'HTML' || ((_b = this.parent) === null || _b === void 0 ? void 0 : _b.type) === 'JsRule' ? 'children' : 'body';
+        const ref = ((_a = this.parent) === null || _a === void 0 ? void 0 : _a.type) == 'HTML' || ((_b = this.parent) === null || _b === void 0 ? void 0 : _b.type) === 'JsRule' || ((_c = this.parent) === null || _c === void 0 ? void 0 : _c.type) === 'Fragment' ? 'children' : 'body';
         if (this.parent.preserveText)
             return this.value;
         else {

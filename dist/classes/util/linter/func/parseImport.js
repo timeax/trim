@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const eslint_1 = require("eslint");
+const __1 = require("..");
 function parseImport(src, linter = new eslint_1.Linter()) {
     const results = [];
     linter.defineRule('get-imports', {
@@ -45,7 +46,9 @@ function parseImport(src, linter = new eslint_1.Linter()) {
         }
     });
     if (!msg.fixed && msg.messages.length > 0)
-        throw msg.messages;
+        throw new __1.CustomError(`${msg.messages.map(ms => {
+            return `${ms.message}... \n   at ${ms.line}:${ms.column}`;
+        }).join('\n')} \n   sourceCode: ${src}`, '');
     return results;
 }
 exports.default = parseImport;

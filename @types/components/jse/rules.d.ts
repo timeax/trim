@@ -5,6 +5,7 @@ export declare class JsRule extends Parent implements TrimRule.JsRule {
     type: 'JsRule';
     value: string;
     component: TrimRule.Program;
+    props: string;
     constructor(props: any);
     private _stop?;
     get stop(): boolean;

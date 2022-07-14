@@ -26,6 +26,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.CustomError = void 0;
+const trim_lint_1 = require("trim-lint");
 const utilities_1 = require("@timeax/utilities");
 const eslint_1 = require("eslint");
 const extract_1 = __importDefault(require("./func/extract"));
@@ -40,6 +42,11 @@ class CodeLinter extends utilities_1.Default {
         this.isSet = true;
     }
     get linter() {
+        this._linter.defineParser('trim-lint-parser', {
+            parse(text, options) {
+                return (0, trim_lint_1.parse)(text, options);
+            },
+        });
         return this._linter;
     }
     set linter(value) {
@@ -48,8 +55,8 @@ class CodeLinter extends utilities_1.Default {
     static parseImportStatement(src, obj = new CodeLinter()) {
         return (0, parseImport_1.default)(src, obj.linter);
     }
-    static jsxLinter(src, obj = new CodeLinter()) {
-        return (0, parsejsx_1.default)(src, obj.linter);
+    static jsxLinter(src, options, obj = new CodeLinter()) {
+        return (0, parsejsx_1.default)(src, obj.linter, options);
     }
     static parseJsE(src, env, obj = new CodeLinter()) {
         return (0, parseJse_1.default)(src, env, obj.linter);
@@ -65,8 +72,9 @@ class CodeLinter extends utilities_1.Default {
     }
     static lintText(src) {
         let valid = true;
-        (0, utilities_1.avoid)(err => (0, extract_1.default)(src)).then(err => valid = !err);
-        return valid;
+        let error;
+        (0, utilities_1.avoid)((err) => (0, extract_1.default)(src)).then((err, msg) => { valid = !err, error = err ? msg : { message: '' }; });
+        return { valid: valid, msg: error };
     }
 }
 exports.default = CodeLinter;
@@ -84,3 +92,10 @@ CodeLinter.reportErr = (context, node, msg = 'Fix the error') => {
         message: msg,
     });
 };
+class CustomError extends Error {
+    constructor(props, name = null) {
+        super(props);
+        this.name = (0, utilities_1.is)(name).notNull ? name : super.name;
+    }
+}
+exports.CustomError = CustomError;

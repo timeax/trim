@@ -1,19 +1,30 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const utilities_1 = require("@timeax/utilities");
 const __1 = require("..");
 const components_1 = require("../../../programs/components");
+const parser_1 = __importDefault(require("../../../util/parser"));
 class ExportRule extends __1.Compiler {
     constructor(props) {
         super(props);
         this.type = 'normal';
+        this.default = false;
         this.rule = props;
         this.isSet = true;
     }
-    run(params) {
+    get name() {
+        return this._name;
+    }
+    set name(value) {
+        this._name = value;
+        if (value === 'default')
+            this.default = true;
+    }
+    run(params = ['']) {
         params = params.map(item => item.trim());
-        if (params.length < 1)
-            throw 'Expected parameters in export rule';
         if (params.length > 2)
             throw 'Expected 1 or 2 params, found three on export rule';
         const call = (prop = '') => {
@@ -28,8 +39,10 @@ class ExportRule extends __1.Compiler {
         };
         params.forEach(param => call(param));
         if ((0, utilities_1.isEmpty)(this.name))
-            throw 'Export must have a name';
-        else if (this.type !== 'normal' && this.type !== 'web')
+            this.name = 'default';
+        else if (!parser_1.default.isCaped(this.name.trim().charAt(0)))
+            this.throw(`Export name '${this.name}' must begin with a capital letter`, 'NameError');
+        if (this.type !== 'normal' && this.type !== 'web')
             throw 'Export type must be either `web or normal`';
         this.rule.compileAsText = true;
         this.rule.close = () => this.close();
@@ -37,6 +50,7 @@ class ExportRule extends __1.Compiler {
     close() {
         this.rule.shut = true;
         const mapper = new components_1.Component();
+        mapper.isDefault = this.default;
         //@ts-ignore
         mapper.sourceParent = this.rule.sourceParent;
         mapper.path = this.rule.loc.path;

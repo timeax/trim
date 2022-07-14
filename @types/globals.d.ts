@@ -43,11 +43,13 @@ export declare namespace TrimRule {
         compile: () => string;
         run: (...props) => void
     }
-    export type Node = Comment | Program | TextNode | JsE | Script | HTML | JsRule | Attributes;
-    export type Tags = Comment | TextNode | JsE | Script | HTML | JsRule;
+    export type Node = Comment | Program | TextNode | JsE | Script | HTML | JsRule | Attributes | Fragment;
+    export type Tags = Comment | TextNode | JsE | Script | HTML | JsRule | Fragment;
     export interface Comment extends Element {
         type: 'Comment';
         value: string;
+        commentType: 'inline' | 'block';
+        closeComment: boolean;
     }
     export type Program = Export | Page | Nodemap | Scraps | Include | Asset;
     export interface TextNode extends Element {
@@ -66,6 +68,13 @@ export declare namespace TrimRule {
         get children(): ChildNodes;
         set children(prop: ChildNodes | Element | Node): void;
         get name(): string;
+    }
+
+    export interface Fragment extends HTML {
+        name: 'FragmentTag$';
+        isBlock: true;
+        htmlType: 'DomElement';
+        type: 'Fragment'
     }
 
     export interface ScriptEngine extends Script {
@@ -127,6 +136,7 @@ export declare namespace TrimRule {
         config: JsRuleConfig;
         params: string[];
         name: string;
+        props: string;
         component?: Program;
     }
     export interface JsRuleConfig {
@@ -187,13 +197,14 @@ export declare namespace TrimRule {
 
     export type ExportType = Component | WebComponent;
 
-    interface Components extends Programs {
+    export interface Components extends Programs {
         sourceType: 'Export';
         exportType: string;
         isStrict: boolean;
         name: string;
         ref: string;
         fragment: Program;
+        isDefault: boolean;
         set exportClose(value: boolean);
     }
 
@@ -215,7 +226,7 @@ export declare namespace TrimRule {
         sourceType: 'NodeMap';
         nodeType: 'NameMap' | 'ElementMap';
         body: Array<Element>;
-        run: (text: string, type: this['nodeType']) => void;
+        run: (text: string, type: this['nodeType'], path: string = '') => void;
         isStrict: false;
     }
     export interface NodemapOtions {
@@ -224,8 +235,8 @@ export declare namespace TrimRule {
     export interface Include extends Programs {
         sourceType: 'Include';
         isStrict: boolean = false;
-        ext: '.htm' | '.txt' | '.js';
-        exts: ['.htm', '.txt', '.js'] = ['.htm', '.txt', '.js'];
+        ext: '.htm' | '.txt' | '.trim' | '.js';
+        exts: ['.htm', '.txt', '.js', '.trim'];
         program: Nodemap | Programs;
         fileContent: string = '';
     };
@@ -254,12 +265,19 @@ export declare namespace TrimRule {
                 default: {},
                 userDefined: Array<{ name: string, path: string }>
             },
+            allowHTM: boolean,
             outDir: string,
             outFile: string,
             compileExtension: string,
-            extensionPrefix: string
+            extensionPrefix: string,
+            allowNullValues: boolean;
+            langOptions: {
+                begin: string,
+                name: string,
+                end: string
+            }
         },
-        useAlpine: boolean = true;
+        useAlpine: boolean;
         exclude: string[],
         include: string[]
     }
@@ -272,6 +290,12 @@ export declare namespace TrimRule {
 
     export interface Value {
         type: 'const' | 'var' | 'let' | 'function' | 'class', names: string[]
+    }
+
+    export interface JSXOptions {
+        path: string;
+        wrapper: 'text' | 'func';
+        imports?: Array<{ name: string, path: string, local: string, default: boolean }>;
     }
 
     export { };

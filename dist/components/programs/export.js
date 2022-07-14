@@ -20,7 +20,11 @@ class Export extends programs_1.Program {
             value.forEach(item => this.exports = item);
         else {
             if (this.exports.some(item => item.name === value.name))
-                throw `Component with name '${value.name}' already exists`;
+                this.throw(`Export with name '${value.name}' already exists
+                    at ${this.path}`, 'RangeExceeded');
+            else if (this.exports.some(item => item.isDefault) && value.isDefault)
+                this.throw(`Cannot have more than one 'default export'
+                    at ${this.path}`, 'RangeExceeded');
             this.exports.push(value);
             if (value.path !== this.path)
                 value.path = this.path;

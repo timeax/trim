@@ -9,7 +9,22 @@ const glob_array_1 = __importDefault(require("glob-array"));
 const glob_1 = require("glob");
 const readline_1 = __importDefault(require("readline"));
 const __1 = require("..");
+const nodemap_1 = require("../components/programs/nodemap");
+//----> global objects
 global.Exports = [];
+global.jsImports = [];
+global.nodeMapper = nodemap_1.Nodemap;
+global.avoid = (arg) => {
+    let result = undefined;
+    try {
+        result = arg();
+    }
+    catch (error) { }
+    return result;
+};
+global.Fs = utilities_1.Fs;
+global.is = utilities_1.is;
+//--------------
 class Actions extends utilities_1.Default {
     constructor(props) {
         super(props);
@@ -17,6 +32,7 @@ class Actions extends utilities_1.Default {
         this.excludes = [];
         this.compileables = [];
         this._config = require('../conf/trim.config.json');
+        this.watcher = null;
         this._settings = this.config;
         this.isSet = true;
     }
@@ -69,20 +85,28 @@ class Actions extends utilities_1.Default {
     watchFolder(path) {
         this.command = 'watchFolder';
         this.path = path;
+        //---
+        if (!(0, utilities_1.is)(this.watcher).null)
+            this.watcher.close(), this.watcher = null;
+        //--
         const compilers = [];
         const watcher = utilities_1.Fs.watch2(this.path, { ignoreInitial: true });
         watcher.on('add', (file) => this.compileFolder(compilers, file, 'add'));
         watcher.on('change', (file) => this.compileFolder(compilers, file, 'change'));
         watcher.on('unlink', (file) => this.compileFolder(compilers, file, 'delete'));
+        this.watcher = watcher;
         setTimeout(() => this.compileFolder(compilers), 1000);
     }
     get hasConfig() {
         const has = utilities_1.Fs.exists(utilities_1.Fs.join(this.path, 'trim.config.json'));
         if (has) {
             if (this.command == 'watchFolder') {
-                const htmFiles = glob_1.glob.sync("**/*.htm", { absolute: true });
-                this.includes = glob_array_1.default.sync(this.config.include, { absolute: true });
-                this.excludes = glob_array_1.default.sync(this.config.exclude, { absolute: true });
+                let htmFiles = glob_1.glob.sync("**/*.trim", { absolute: true });
+                if (this.settings.compilerOptions.allowHTM) {
+                    htmFiles = [...htmFiles, glob_1.glob.sync("**/*.htm", { absolute: true })];
+                }
+                this.includes = glob_array_1.default.sync(this.settings.include, { absolute: true });
+                this.excludes = glob_array_1.default.sync(this.settings.exclude, { absolute: true });
                 let filtered = htmFiles.filter(path => !this.excludes.includes(path));
                 this.includes
                     .filter(path => !this.excludes.includes(path))
@@ -142,7 +166,7 @@ class Actions extends utilities_1.Default {
         this.msg = 'File change detected. Starting incremental compilation...';
         //--
         const create = (item) => {
-            if (utilities_1.Fs.ext(item) === '.htm') {
+            if (utilities_1.Fs.ext(item) === '.trim' || (this.settings.compilerOptions.allowHTM && utilities_1.Fs.ext(item) === '.htm')) {
                 const trim = new __1.Trim(this.settings);
                 trim.base = this.path;
                 trim.run(item);
@@ -184,14 +208,14 @@ class Actions extends utilities_1.Default {
     }
     onChange(path, compilers) {
         if (utilities_1.Fs.name(path) === 'trim.config.json')
-            return (this.hasConfig) && this.compileFolder(compilers, this.path);
+            return this.watchFolder(this.path);
         //-- check exports 
         const obj = global.Exports.find(item => utilities_1.Fs.samePath(path, item.path));
         if (!(0, utilities_1.is)(obj).null)
             obj.program.rerun = true;
         const programs = [];
         //@ts-ignore
-        if (utilities_1.Fs.ext(path) === '.htm')
+        if (utilities_1.Fs.ext(path) === '.trim' || (this.settings.compilerOptions.allowHTM && utilities_1.Fs.ext(path) === '.htm'))
             this.findImports(compilers, path, programs);
         else
             this.findAssets(compilers, path, programs), this.xcache = path;

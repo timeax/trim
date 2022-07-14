@@ -70,7 +70,7 @@ class NodemapBase extends _1.Program {
         //-----------------
         builder.text += text;
         //=== is closing html tag
-        if (this.trim.htmlClose(text))
+        if (this.trim.finaliseNode(text))
             return;
         //----------------
         if (this.trim.justClosed)

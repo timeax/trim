@@ -5,7 +5,7 @@ const utilities_1 = require("@timeax/utilities");
 class BaseNode extends utilities_1.Default {
     constructor(props) {
         super(props);
-        this.loc = { start: null, end: null, path: '' };
+        this.loc = { start: null, end: null, path: '', source: '' };
         this.firstRun = true;
         this.compiler = this;
         this._isBlock = false;

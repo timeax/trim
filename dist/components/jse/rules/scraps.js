@@ -36,9 +36,8 @@ class ScrapsRule extends _1.Compiler {
         });
         if ((0, utilities_1.isEmpty)(src))
             throw `Unset parameter 'path' in Scraps`;
-        this.path = utilities_1.Fs.join(utilities_1.Fs.dirname(this.rule.loc.path), src);
-        ;
-        this.restLoc = close ? utilities_1.Fs.join(utilities_1.Fs.dirname(this.rule.loc.path), close) : '';
+        this.src = utilities_1.Fs.join(utilities_1.Fs.dirname(this.rule.loc.path), src);
+        this.restLoc = close ? this.setSrc(utilities_1.Fs.join(utilities_1.Fs.dirname(this.rule.loc.path), close)) : '';
         this.rule.close = () => this.close();
     }
     close() {
@@ -59,7 +58,7 @@ class ScrapsRule extends _1.Compiler {
     set path(value) {
         super.path = value;
         if (!utilities_1.Fs.name(value).startsWith('_'))
-            throw 'Filename must begin with an underscore..';
+            this.rule.throw('Filename must begin with an underscore..', 'FileNameError');
     }
 }
 exports.default = ScrapsRule;

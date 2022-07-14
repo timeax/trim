@@ -10,6 +10,6 @@ function moduleLoader(path) {
     function matcher(name) {
         return true;
     }
-    return (0, pirates_1.addHook)((code, name) => linter_1.default.jsxLinter(code).verify(), { exts: ['.js'] });
+    return (0, pirates_1.addHook)((code, name) => linter_1.default.jsxLinter(code, { wrapper: 'func', path: path }).verify(), { exts: ['.js'] });
 }
 exports.moduleLoader = moduleLoader;

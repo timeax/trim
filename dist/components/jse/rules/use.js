@@ -16,28 +16,37 @@ class Use extends _1.Compiler {
     run(param = ['']) {
         const stmt = `import ${param[0].trim()}`;
         const props = linter_1.default.parseImportStatement(stmt);
-        this.path = (() => {
+        this.src = (() => {
             let path = props[0].src;
             if (!path.startsWith('.') && !path.startsWith('/'))
                 return path;
             return utilities_1.Fs.join(utilities_1.Fs.dirname(this.rule.loc.path), path);
         })();
-        this.imports = props[0].imports.map(item => ({ local: item.local, name: item.imported }));
+        this.imports = props[0].imports.map(item => ({ local: item.local, name: item.imported, default: item.default }));
         this.load();
     }
     load() {
         const pageExport = this.pageExport;
+        const getObj = (item, imp) => {
+            const obj = item.clone;
+            obj.ref = imp.local;
+            obj.globalParent = this.rule.sourceParent;
+            return obj;
+        };
+        //----
         const exports = pageExport.exports.map(item => {
-            const imp = this.imports.find(ref => ref.name === item.name);
+            const imp = this.imports.filter(item => !item.default).find(ref => ref.name === item.name);
             let valid = '';
-            if (!(0, utilities_1.is)(imp).null) {
-                const obj = item.clone;
-                obj.ref = imp.local;
-                obj.globalParent = this.rule.sourceParent;
-                valid = obj;
-            }
+            if (!(0, utilities_1.is)(imp).null)
+                valid = getObj(item, imp);
             return valid;
         }).filter(item => typeof item === 'object');
+        //----
+        const def = pageExport.exports.find(item => item.isDefault);
+        const imp = this.imports.find(item => item.default);
+        //---
+        if (!(0, utilities_1.is)(imp).null && !(0, utilities_1.is)(def).null)
+            exports.push(getObj(def, imp));
         //@ts-ignore
         this.rule.sourceParent.imports = exports;
     }
@@ -47,7 +56,7 @@ class Use extends _1.Compiler {
     set path(value) {
         super.path = value;
         if (!utilities_1.Fs.name(value).startsWith('_'))
-            throw 'Filename must begin with an underscore..';
+            this.throw('Filename must begin with an underscore..', 'FileNameError');
     }
     get pageExport() {
         const getExport = () => {

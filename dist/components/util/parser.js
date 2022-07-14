@@ -19,12 +19,16 @@ class Parser {
             result = 'JsE';
         else if (word === '{%')
             result = 'JsE';
-        else if (word === '/*')
+        else if (word === '{@')
+            result = 'JsRule';
+        else if (word === '/*' || word === '//')
             result = 'Comment';
         else if (word.trim().startsWith('<%'))
             result = 'Script';
         else if (word.trim().match(/<\w+/g))
             result = 'HTML';
+        else if (word.trim().match(/<>/g))
+            result = 'Fragment';
         return result;
     }
     static isCaped(word) {

@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JsEBase = void 0;
+const utilities_1 = require("@timeax/utilities");
 const linter_1 = __importDefault(require("../../util/linter"));
 const element_1 = require("../element");
 class JsEBase extends element_1.Element {
@@ -35,22 +36,31 @@ class JsEBase extends element_1.Element {
         super.isClosed = value;
     }
     errorCheck(value) {
-        if (value && linter_1.default.lintText(this.value))
+        const { valid, msg } = linter_1.default.lintText(this.value);
+        if (value && valid)
             return value;
+        console.log(msg);
     }
     lint() {
-        const output = linter_1.default.jsxLinter(this.value);
+        const output = linter_1.default.jsxLinter(this.value, { wrapper: 'text', path: this.loc.path });
         const msg = linter_1.default.parseExpression(output.verify());
-        if (!msg.fixed && msg.messages.length > 0) {
-            console.log(msg.messages);
-            throw 'Errow linting code at line ' + this.loc.start.line;
-        }
+        if (!msg.fixed && msg.messages.length > 0)
+            this.throw(`Errors found in JsScript 
+            -> [
+                ${msg.messages.map(ms => `${ms.message}... at line ${ms.line}`)}
+            ];
+                at ${utilities_1.Fs.name(this.loc.path)}
+            `);
         this.value = msg.output;
     }
     parseScript() {
         const script = linter_1.default.parseJsE(this.value, this.sourceParent.scriptEngine.env).verify();
         let code = '';
         const { env, names, out } = linter_1.default.parseScript(script, {
+            wrapper: 'func',
+            path: this.loc.path,
+            //@ts-ignore
+            imports: this.sourceParent.imports.filter(item => item.sourceType === 'Export').map(item => ({ name: item.name, local: item.ref, default: item.isDefault, path: item.path })),
             env: this.sourceParent.scriptEngine.env,
             useImports: false, id: this.sourceParent.scriptEngine.compileId
         });

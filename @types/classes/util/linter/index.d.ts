@@ -7,7 +7,7 @@ export default class CodeLinter extends Default {
     set linter(value: Linter);
     constructor();
     static parseImportStatement(src: string, obj?: CodeLinter): import("./func/parseImport").importLint[];
-    static jsxLinter(src: string, obj?: CodeLinter): {
+    static jsxLinter(src: string, options: TrimRule.JSXOptions, obj?: CodeLinter): {
         verify(): string;
     };
     static parseJsE(src: string, env: TrimRule.env[], obj?: CodeLinter): {
@@ -17,10 +17,10 @@ export default class CodeLinter extends Default {
     static reportErr: (context: Rule.RuleContext, node: any, msg?: string) => void;
     static extractExpression(src: string, obj?: CodeLinter): {
         src: string;
-        type: "ArrayExpression" | "ArrayPattern" | "ArrowFunctionExpression" | "AssignmentExpression" | "AssignmentPattern" | "AwaitExpression" | "BinaryExpression" | "BlockStatement" | "BreakStatement" | "CallExpression" | "CatchClause" | "ChainExpression" | "ClassBody" | "ClassDeclaration" | "ClassExpression" | "ConditionalExpression" | "ContinueStatement" | "DebuggerStatement" | "DoWhileStatement" | "EmptyStatement" | "ExportAllDeclaration" | "ExportDefaultDeclaration" | "ExportNamedDeclaration" | "ExportSpecifier" | "ExpressionStatement" | "ForInStatement" | "ForOfStatement" | "ForStatement" | "FunctionDeclaration" | "FunctionExpression" | "Identifier" | "IfStatement" | "ImportDeclaration" | "ImportDefaultSpecifier" | "ImportExpression" | "ImportNamespaceSpecifier" | "ImportSpecifier" | "LabeledStatement" | "Literal" | "LogicalExpression" | "MemberExpression" | "MetaProperty" | "MethodDefinition" | "NewExpression" | "ObjectExpression" | "ObjectPattern" | "Program" | "Property" | "RestElement" | "ReturnStatement" | "SequenceExpression" | "SpreadElement" | "Super" | "SwitchCase" | "SwitchStatement" | "TaggedTemplateExpression" | "TemplateElement" | "TemplateLiteral" | "ThisExpression" | "ThrowStatement" | "TryStatement" | "UnaryExpression" | "UpdateExpression" | "VariableDeclaration" | "VariableDeclarator" | "WhileStatement" | "WithStatement" | "YieldExpression" | "StaticBlock" | "PrivateIdentifier" | "PropertyDefinition";
+        type: "Program" | "CatchClause" | "ClassBody" | "Identifier" | "Literal" | "MethodDefinition" | "PrivateIdentifier" | "Property" | "PropertyDefinition" | "SpreadElement" | "Super" | "SwitchCase" | "TemplateElement" | "VariableDeclarator" | "ArrayExpression" | "ArrowFunctionExpression" | "AssignmentExpression" | "AwaitExpression" | "BinaryExpression" | "CallExpression" | "ChainExpression" | "ClassExpression" | "ConditionalExpression" | "FunctionExpression" | "ImportExpression" | "LogicalExpression" | "MemberExpression" | "MetaProperty" | "NewExpression" | "ObjectExpression" | "SequenceExpression" | "TaggedTemplateExpression" | "TemplateLiteral" | "ThisExpression" | "UnaryExpression" | "UpdateExpression" | "YieldExpression" | "ClassDeclaration" | "FunctionDeclaration" | "ImportDeclaration" | "ExportNamedDeclaration" | "ExportDefaultDeclaration" | "ExportAllDeclaration" | "ImportSpecifier" | "ImportDefaultSpecifier" | "ImportNamespaceSpecifier" | "ExportSpecifier" | "ObjectPattern" | "ArrayPattern" | "RestElement" | "AssignmentPattern" | "ExpressionStatement" | "BlockStatement" | "StaticBlock" | "EmptyStatement" | "DebuggerStatement" | "WithStatement" | "ReturnStatement" | "LabeledStatement" | "BreakStatement" | "ContinueStatement" | "IfStatement" | "SwitchStatement" | "ThrowStatement" | "TryStatement" | "WhileStatement" | "DoWhileStatement" | "ForStatement" | "ForInStatement" | "ForOfStatement" | "VariableDeclaration";
     }[];
     static parseExpression(src: string, obj?: CodeLinter): Linter.FixReport;
-    static parseScript(src: string, options: {
+    static parseScript(src: string, options: TrimRule.JSXOptions & {
         env: TrimRule.env[];
         useImports: boolean;
         id: number;
@@ -29,5 +29,13 @@ export default class CodeLinter extends Default {
         names: string[];
         out: string;
     };
-    static lintText(src: string): boolean;
+    static lintText(src: string): {
+        valid: boolean;
+        msg: {
+            message: string;
+        };
+    };
+}
+export declare class CustomError extends Error {
+    constructor(props: any, name?: string);
 }

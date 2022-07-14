@@ -45,7 +45,7 @@ class Includer extends _1.Compiler {
         this.strict = isStrict && true;
         if ((0, utilities_1.is)(src).null)
             throw 'Path variable for include not found';
-        this.path = utilities_1.Fs.join(utilities_1.Fs.dirname(this.rule.loc.path), src);
+        this.src = utilities_1.Fs.join(utilities_1.Fs.dirname(this.rule.loc.path), src);
         this.include();
     }
     include() {

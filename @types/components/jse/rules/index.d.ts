@@ -9,4 +9,6 @@ export declare class Compiler extends Default {
     private _path;
     get path(): string;
     set path(value: string);
+    set src(value: string);
+    setSrc(value: string): string;
 }

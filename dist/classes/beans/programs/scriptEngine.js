@@ -84,7 +84,13 @@ class ScriptEngine extends element_1.Element {
         }
     }
     lint() {
-        const { env, names, out } = linter_1.default.parseScript(this.value, { env: this.env, useImports: true, id: this.compileId });
+        const { env, names, out } = linter_1.default.parseScript(this.value, {
+            env: this.env,
+            useImports: true,
+            id: this.compileId,
+            wrapper: 'func',
+            path: this.caller.path,
+        });
         this.names = names;
         //@ts-ignore
         this.env = env;

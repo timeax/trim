@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Trim = void 0;
 const utilities_1 = require("@timeax/utilities");
 const classes_1 = require("./classes");
-const rules_1 = require("./components/jse/rules");
 const parser_1 = __importDefault(require("./components/util/parser"));
 class Trim extends classes_1.TrimBaseClass {
     constructor(props) {
@@ -56,6 +55,7 @@ class Trim extends classes_1.TrimBaseClass {
             return true;
         this.parseComment(char);
         this.parseJsE(char);
+        this.parseJsRule(char);
         this.parseScript(char);
         this.parseHTML(char);
         this.parseText(char);
@@ -66,6 +66,16 @@ class Trim extends classes_1.TrimBaseClass {
     parseComment(char) {
         const { current } = this;
         if (current.type === 'Comment') {
+            if (current.commentType == 'inline') {
+                if (current.closeComment) {
+                    current.closed = true;
+                    this.justClosed = true;
+                    return;
+                }
+                current.loc.source += char;
+                current.value += char;
+                return;
+            }
             if (char === '*')
                 current.temp += char;
             else {
@@ -73,7 +83,7 @@ class Trim extends classes_1.TrimBaseClass {
                     if (char == '/') {
                         current.closed = true;
                         current.loc.end = { line: this.line, column: this.column };
-                        current.loc.source = `/*${current.value}*/`;
+                        current.loc.source += `${current.value}*/`;
                         this.justClosed = true;
                     }
                 }
@@ -82,10 +92,11 @@ class Trim extends classes_1.TrimBaseClass {
             }
         }
     }
-    parseJsE(char, ignore = false, current = this.current) {
-        let { store } = this;
+    parseJsE(char) {
+        let { store, current } = this;
         if (current.type == 'JsE') {
             const ref = current.sourceType == 'script' ? '%' : '}';
+            //----
             if (ref === '%')
                 this.parseJsS(char, current);
             else {
@@ -95,65 +106,64 @@ class Trim extends classes_1.TrimBaseClass {
                     this.store--;
                 if (char == '}' && store > 0)
                     current.value += char;
-                else if (char == '}' && current.temp == ref) {
-                    let value = current.value;
-                    let text;
-                    if (current.sourceType == 'expression') {
-                        const match = value.match(/@\w+/g);
-                        if ((0, utilities_1.is)(match).notNull)
-                            text = match[0];
-                        if (value.trim().startsWith('/')) {
-                            if ((0, utilities_1.is)(current.parent).null && this.component.body.length === 0)
-                                throw 'Component not found';
-                            //---
-                            // current.parent.children.pop();
-                            current.isUseless = true;
-                            current.closed = true;
-                            //-----
-                            const name = value.substring(1, value.length);
-                            const component = this.find('JsRule', name);
-                            if ((0, utilities_1.is)(component).null) {
-                                if (ignore)
-                                    return this.element = null;
-                            }
-                            else {
-                                if (ignore)
-                                    return component.stop = true;
-                                //-----
-                                this.__current = component;
-                                component.closed = true;
-                                this.justClosed = true;
-                                //----
-                                return;
-                            }
-                        }
-                        else {
-                            if (ignore)
-                                return this.element = null;
-                            if (value.trim().startsWith(text)) {
-                                const jsRule = new rules_1.JsRule(this);
-                                jsRule.sourceParent = this.component;
-                                jsRule.loc = current.loc;
-                                jsRule.params = value.trim().substring(text.length, value.length).split(',');
-                                this.__current = jsRule;
-                                jsRule.name = text;
-                                current = jsRule;
-                                jsRule.parent = this.parent;
-                                this.opened.push(jsRule);
-                                //@ts-ignore
-                            }
-                            else
-                                current.parent = this.parent;
-                        }
-                        current.isClosed = true;
-                        this.justClosed = true;
-                    }
-                }
+                else if (char == '}' && current.temp == ref)
+                    current.isClosed = true, this.justClosed = true;
                 else if (char === ref)
                     current.temp += char;
                 else
                     current.value += char;
             }
+        }
+    }
+    parseJsRule(char, current = this.current) {
+        const set = (current) => {
+            current.name = current.temp;
+            current.temp = '';
+            current.firstRun = false;
+            current.parent = this.parent;
+            this.opened.push(current);
+        };
+        //----
+        if (current.type === 'JsRule') {
+            if (current.firstRun) {
+                this.store = 1;
+                if (parser_1.default.isWord(char))
+                    current.temp += char;
+                else {
+                    if (parser_1.default.isWN(char)) {
+                        if ((0, utilities_1.isEmpty)(current.temp)) {
+                            current.isUseless = true;
+                            this.current = this.createElement('TextNode');
+                            this.current.loc = current.loc;
+                            this.current.parent = this.parent;
+                            this.current.value = '{@' + char;
+                        }
+                        else
+                            set(current);
+                    }
+                    else if (char !== '}')
+                        throw 'TypeError at ' + this.line;
+                    else
+                        set(current), current.isClosed = true, this.justClosed = true;
+                }
+                return;
+            }
+            //---
+            if (char === '{')
+                ++this.store;
+            if (char === '}')
+                this.store--;
+            //---
+            if (char == '}' && this.store > 0)
+                current.props += char;
+            else if (char == '}') {
+                current.params = current.props.trim().split(',');
+                //@ts-ignore
+                current.isClosed = true;
+                this.justClosed = true;
+            }
+            else
+                current.props += char;
         }
     }
     parseJsS(char, current) {
@@ -243,31 +253,59 @@ class Trim extends classes_1.TrimBaseClass {
             }
         }
     }
-    htmlClose(char) {
+    finaliseNode(char) {
+        if (this.isJSE)
+            return this.nodeClose(char, 'isJSE');
+        else if (this.isHTML)
+            return this.nodeClose(char, 'isHTML');
+        return false;
+    }
+    nodeClose(char, FIELD) {
+        let ref = FIELD == 'isHTML' ? 'HTML' : 'JsRule';
+        const token = FIELD == 'isHTML' ? '>' : '}';
+        //--
         const { current } = this;
         let word = '';
+        //---
+        if (current.compileAsText && current.type !== ref)
+            return this[FIELD] = false;
+        //--
         const run = (char) => {
-            if (char === '>') {
-                this.word = this.word.substring(0, this.word.length - 1).trim();
+            if (char === token) {
+                this.word = this.word.substring(0, this.word.length - 1);
                 word = this.word;
-                this.isHTML = false;
+                this[FIELD] = false;
             }
-            return !this.isHTML;
+            return !this[FIELD];
         };
+        //----
         const close = (word) => {
-            const element = this.find('HTML', word);
+            const element = this.find(ref, word);
+            if (current.compileAsText) {
+                if (current !== element)
+                    return this[FIELD] = false, current.value += word;
+                current.value = current.value.substring(0, current.value.length - 2);
+            }
+            if ((0, utilities_1.is)(element).null)
+                this.throw(`Could not find ${ref} tag with name; '${word}'
+                     at ${ref == 'HTML' ? `</${word}>` : `{/${word}}`}
+                     at ${utilities_1.Fs.name(this.currentPath)}:${this.line}`, 'NoMatchFound');
+            element.loc.end = { line: this.line, column: this.column };
+            this.justClosed = true;
             this.__current = element;
             element.closed = true;
-            this.justClosed = true;
         };
-        if (this.isHTML) {
+        //-----
+        if (this[FIELD]) {
             this.counter++;
             this.word += char;
             if (this.counter === 1) {
-                if ((0, utilities_1.isEmpty)(this.word))
-                    this.isHTML = false, console.warn(`Suspected html closing at ${this.line}`);
+                if (char === '>' && ref == 'HTML')
+                    this[FIELD] = false, ref = 'Fragment', close('FragmentTag$');
+                else if ((0, utilities_1.isEmpty)(this.word))
+                    this[FIELD] = false, console.warn(`Suspected ${ref} closing at ${this.line}`);
                 else if (!parser_1.default.isWord(char))
-                    this.isHTML = false;
+                    this[FIELD] = false;
                 else {
                     if (current.type === 'TextNode') {
                         let { value } = current;
@@ -283,17 +321,17 @@ class Trim extends classes_1.TrimBaseClass {
             else if (run(char))
                 close(word);
         }
-        return this.isHTML;
+        return this[FIELD];
     }
     parseText(char) {
-        const { current, builder, isHTML: html } = this;
+        const { current, builder, isHTML: html, isJSE } = this;
         if (current.type === 'TextNode') {
             this.charTracker(char);
             this.parseChar(char);
             if (this.lookout)
                 current.temp += char;
-            if (html) {
-                this.htmlClose(char);
+            if (html || isJSE) {
+                this.finaliseNode(char);
                 return false;
             }
             let { word } = builder;

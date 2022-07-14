@@ -9,7 +9,7 @@ const script_1 = require("../../classes/beans/script");
 class Include extends programs_1.Program {
     constructor(props, options) {
         super(props, options);
-        this.exts = ['.htm', '.txt', '.js'];
+        this.exts = ['.htm', '.txt', '.js', '.trim'];
         this.sourceType = 'Include';
         this.fileContent = '';
         this.isStrict = false;
@@ -24,15 +24,15 @@ class Include extends programs_1.Program {
         super.path = value;
         //@ts-ignore
         if (!this.exts.includes(utilities_1.Fs.ext(value)))
-            throw `Unsupported extension '${utilities_1.Fs.ext(value)}'`;
+            throw TypeError(`Unsupported extension '${utilities_1.Fs.ext(value)}'`);
         //@ts-ignore
         this.ext = utilities_1.Fs.ext(value);
-        if (this.ext == '.htm')
+        if (this.ext == '.htm' || this.ext === '.trim')
             this.program = this;
         this.fileContent = utilities_1.Fs.content(value);
     }
     run() {
-        if (this.ext === '.htm') {
+        if (this.ext === '.htm' || this.ext === '.trim') {
             if (!utilities_1.Fs.name(this.path).startsWith('_'))
                 throw 'Filename must start with an underscore';
             //@ts-ignore
@@ -62,7 +62,7 @@ class Include extends programs_1.Program {
     }
     set rerun(value) {
         if (value) {
-            if (this.ext == '.htm')
+            if (this.ext == '.htm' || this.ext === '.trim')
                 super.rerun = true;
             else
                 this.sourceParent.rerun = true;
@@ -74,7 +74,7 @@ class Include extends programs_1.Program {
         return super.compile();
     }
     close() {
-        if (this.ext !== '.htm')
+        if (this.ext !== '.htm' && this.ext !== '.trim')
             return;
         this.compileScripts();
         //@ts-ignore

@@ -2,8 +2,8 @@ import { TrimRule } from "../../../@types/globals";
 import { Program } from "../../classes/beans/programs";
 export declare class Include extends Program implements TrimRule.Include {
     program: TrimRule.Programs | TrimRule.Nodemap;
-    exts: [".htm", ".txt", ".js"];
-    ext: ".js" | ".htm" | ".txt";
+    exts: ['.htm', '.txt', '.js', '.trim'];
+    ext: ".js" | ".htm" | '.trim' | ".txt";
     sourceType: 'Include';
     fileContent: string;
     parentNode: TrimRule.Parent;

@@ -11,10 +11,12 @@ export declare class Trim extends TrimBaseClass {
     private start;
     parseCurrent(char: string): boolean;
     parseComment(char: string): void;
-    parseJsE(char: string, ignore?: boolean, current?: TrimRule.Element): boolean;
+    parseJsE(char: string): void;
+    parseJsRule(char: string, current?: TrimRule.Element): void;
     parseJsS(char: string, current: any): void;
     parseScript(char: string): void;
     parseHTML(char: string): void;
-    htmlClose(char: string): boolean;
+    finaliseNode(char: string): boolean;
+    nodeClose(char: string, FIELD: 'isHTML' | 'isJSE'): boolean;
     parseText(char: string): boolean;
 }

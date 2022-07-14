@@ -13,14 +13,19 @@ const TextNode_1 = require("./beans/others/TextNode");
 const Page_1 = require("../components/programs/Page");
 const script_1 = require("./beans/script");
 const programs_1 = require("./beans/programs");
+const rules_1 = require("../components/jse/rules");
+const Fragment_1 = require("./beans/html/Fragment");
+const trim_config_json_1 = __importDefault(require("../conf/trim.config.json"));
 class TrimBaseClass extends utilities_1.Default {
     //@ts-ignore
-    constructor(props = {}) {
+    constructor(props = trim_config_json_1.default) {
         super(props);
         this.tracker = false;
         this.base = '';
         this._path = '';
         this._currentPath = '';
+        //@ts-ignore
+        this._config = trim_config_json_1.default;
         this._line = 1;
         this._column = 0;
         this._opened = [];
@@ -29,6 +34,7 @@ class TrimBaseClass extends utilities_1.Default {
         this._word = '';
         this._isHTML = false;
         this._isJSE = false;
+        this._store = 0;
         this._lookout = false;
         this._esc = false;
         this._temp = '';
@@ -94,20 +100,16 @@ class TrimBaseClass extends utilities_1.Default {
         })();
         value.sourceParent = this.component;
         this._current = value;
-        if (this._current.type !== 'JsE')
-            this._current.parent = parent;
-        else if (this._current.sourceType === 'script')
-            this._current.parent = parent;
-        else
-            this.parent = parent;
         this.current.loc.path = this.currentPath;
         if ((0, utilities_1.is)(this.current).notNull) {
             this.current.loc.start = { column: this.column, line: this.line };
-            if (this.current.type !== 'JsE')
-                this.opened.push(this.current);
-            else if (this.current.sourceType == 'script')
+            if (this.current.type !== 'JsRule')
                 this.opened.push(this.current);
         }
+        if (this._current.type !== 'JsRule')
+            this._current.parent = parent;
+        else
+            this.parent = parent;
     }
     set __current(value) {
         this._current = value;
@@ -119,6 +121,12 @@ class TrimBaseClass extends utilities_1.Default {
         this._line = value;
         this.column = 0;
         this.builder.clearBuild();
+        if (this.current.type === 'Comment' && this.current.commentType === 'inline')
+            this.current.closeComment = true;
+    }
+    createElement(value) {
+        const obj = this.classes.find(item => item.name === value);
+        return obj.type;
     }
     get column() {
         return this._column;
@@ -149,6 +157,7 @@ class TrimBaseClass extends utilities_1.Default {
             this.isHTML = false;
             this.isJSE = false;
             this.esc = false;
+            this.builder.clear();
         }
     }
     get counter() {
@@ -175,6 +184,8 @@ class TrimBaseClass extends utilities_1.Default {
         return this._isJSE;
     }
     set isJSE(value) {
+        this.word = '';
+        this.counter = 0;
         this._isJSE = value;
     }
     get store() {
@@ -238,11 +249,15 @@ class TrimBaseClass extends utilities_1.Default {
             //@ts-ignore
             { name: 'JsE', type: jse_1.JsE },
             //@ts-ignore
+            { name: 'JsRule', type: rules_1.JsRule },
+            //@ts-ignore
             { name: 'TextNode', type: TextNode_1.TextNode },
             //@ts-ignore
             { name: 'Comment', type: others_1.Comment },
             //@ts-ignore
             { name: 'Script', type: script_1.Script },
+            //@ts-ignore
+            { name: 'Fragment', type: Fragment_1.Fragment },
         ];
         this.builder = {
             word: '',
@@ -325,7 +340,7 @@ class TrimBaseClass extends utilities_1.Default {
             return (this.justClosed = false);
         //===============
         builder.text += text;
-        if (this.htmlClose(char))
+        if (this.finaliseNode(char))
             return;
         //----------------
         if (this.justClosed)
@@ -339,7 +354,7 @@ class TrimBaseClass extends utilities_1.Default {
             builder.clearText();
             // parse new word
             const type = parser_1.default.parse(builder.word);
-            const objType = this.classes.find(obj => obj.name === type).type;
+            const objType = this.createElement(type);
             const call = () => {
                 this.store = 0;
                 //@ts-ignore
@@ -348,7 +363,11 @@ class TrimBaseClass extends utilities_1.Default {
                     if (builder.word === '{%')
                         obj.sourceType = 'script';
                 }
+                else if (obj.type === 'Comment')
+                    obj.commentType = builder.word === '//' ? 'inline' : 'block';
                 this.current = obj;
+                if (this.current.type === 'Fragment')
+                    this.current.isClosed = true;
             };
             if (type !== 'TextNode') {
                 if (current.type === 'TextNode')
@@ -366,6 +385,9 @@ class TrimBaseClass extends utilities_1.Default {
             }
         }
     }
+    finaliseNode(char, current = null) {
+        throw new Error('Method not implemented.');
+    }
     charTracker(char, ignore = false) {
         if ((0, utilities_1.is)(char).null)
             return;
@@ -377,17 +399,21 @@ class TrimBaseClass extends utilities_1.Default {
                 return;
         }
         //####################
-        const play = (run = true) => ignore ? ((this.type == 'brace' || this.isHTML) && run) && this.ignoreNext(null, char) : run && this.handle(null, char);
+        const play = (run = true) => !ignore && run && this.handle(null, char);
         //-------
         if (this.lookout) {
             if (this.type == 'angle-bracket') {
-                if (parser_1.default.isWord(char) || char === '%')
+                if (parser_1.default.isWord(char) || char === '%' || char == '>')
                     play();
                 else if (char === '/')
                     this.isHTML = true;
             }
-            else if (this.type === 'brace')
-                play(char === '{' || char === '%');
+            else if (this.type === 'brace') {
+                if (char === '/')
+                    this.isJSE = true;
+                else
+                    play(char === '{' || char === '%' || char === '@');
+            }
             else if (this.type === 'slash')
                 play(char === '*' || char === '/');
         }
@@ -426,9 +452,6 @@ class TrimBaseClass extends utilities_1.Default {
                 break;
         }
     }
-    htmlClose(char) {
-        throw new Error('Method not implemented.');
-    }
     parseCurrent(text) {
         throw new Error('Method not implemented.');
     }
@@ -447,42 +470,18 @@ class TrimBaseClass extends utilities_1.Default {
             if (current.compileAsText) {
                 ans = true;
                 if (current.isClosed) {
-                    let charTrack = char == null && true;
-                    let text = charTrack ? '' : char;
-                    if (current.type === 'HTML') {
-                        if (this.isHTML) {
-                            this.temp += char;
-                            if (this.htmlClose(char))
-                                return !current.closed;
-                        }
-                    }
-                    else if (this.element.type === 'JsE') {
-                        //--- avoid html logs
-                        this.isHTML = false;
-                        //-----
-                        this.temp += char;
-                        //-- commented code at end of file -- //
-                        this.parseJsE(char, true, this.element);
-                        //=======------>>>>
-                        if (this.element.type === null)
-                            current.value += this.temp, this.temp = '';
-                        if (current.stop)
-                            current.value = current.value.substring(0, current.value.length - 2), current.closed = true, this.justClosed = true;
-                        //-----
+                    if (this.finaliseNode(char))
                         return !current.closed;
-                    }
                     this.charTracker(char, true);
                     this.parseChar(char);
-                    //--
-                    if (charTrack && prev === '{')
-                        this.element = new jse_1.JsE(this), this.temp = '';
-                    current.value += text;
+                    current.value += char;
                 }
             }
         }
         return ans;
     }
     find(node, name) {
+        name = name.trim();
         const rearranged = this.opened.map(item => item).reverse();
         for (const component of rearranged) {
             if (component.type === node) {
@@ -533,14 +532,31 @@ class TrimBaseClass extends utilities_1.Default {
                 if (item.type == 'TextNode' || item.type == 'Comment')
                     item.isClosed = true;
             });
+            //@ts-ignore
             if (counter === 10)
-                throw Error('please close all your tags');
+                this.throw('Please close all your tags \n' + this.opened.map(item => `${item.loc.source} at ${utilities_1.Fs.name(item.loc.path)}:${JSON.stringify(item.loc.start.line)} `), 'UnclosedTagsException');
             counter++;
         }
     }
 }
 exports.TrimBaseClass = TrimBaseClass;
-// if (this.element.firstRun) {
-//     this.element.firstRun = false;
-//     return true;
+//? ((this.type == 'brace' || this.isHTML) && run) && this.ignoreNext(null, char) :
+// if (current.type === 'HTML') {
+//     if (this.isHTML) {
+//         this.temp += char;
+//         if (this.htmlClose(char))
+//             return !current.closed;
+//     }
+// } else if (this.element.type === 'JsE') {
+//     //--- avoid html logs
+//     this.isHTML = false;
+//     //-----
+//     this.temp += char;
+//     //-- commented code at end of file -- //
+//     this.parseJsE(char, true, this.element);
+//     //=======------>>>>
+//     if (this.element.type === null) current.value += this.temp, this.temp = '';
+//     if (current.stop) current.value = current.value.substring(0, current.value.length - 2), current.closed = true, this.justClosed = true;
+//     //-----
+//     return !current.closed;
 // }

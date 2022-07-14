@@ -12,6 +12,7 @@ class JsRule extends element_1.Parent {
         super(props);
         this.type = 'JsRule';
         this.value = '';
+        this.props = '';
         this._stop = false;
         this.isSet = true;
     }
@@ -40,7 +41,7 @@ class JsRule extends element_1.Parent {
         return this._name;
     }
     set name(value) {
-        this._name = value.substring(1, value.length);
+        this._name = value;
         this.config = jse_config_json_1.default.find(file => file.name === this.name);
     }
     get isClosed() {

@@ -16,8 +16,8 @@ function extractVars(source, func, _$ = false, glob = null) {
     }
 }
 exports.extractVars = extractVars;
-function _call(global, src) {
-    const _$ = global;
+function _call(globals, src) {
+    const _$ = globals;
     return eval(src);
 }
 exports._call = _call;
