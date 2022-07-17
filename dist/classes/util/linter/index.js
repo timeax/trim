@@ -64,8 +64,8 @@ class CodeLinter extends utilities_1.Default {
     static extractExpression(src, obj = new CodeLinter()) {
         return (0, extractExp_1.default)(src, obj.linter);
     }
-    static parseExpression(src, obj = new CodeLinter()) {
-        return (0, extractExp_1.expressionLinter)(src, obj.linter);
+    static parseExpression(src, args = null, obj = new CodeLinter()) {
+        return (0, extractExp_1.expressionLinter)(src, obj.linter, args);
     }
     static parseScript(src, options, obj = new CodeLinter()) {
         return (0, extract_1.default)(src, obj.linter, options);

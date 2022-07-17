@@ -22,22 +22,29 @@ class Component extends Components_1.ComponentBase {
                 if (value.name !== 'fragment' && value.type !== 'TextNode' && value.type !== 'Comment' && value.type !== 'Script') {
                     if (value.type == 'JsRule') {
                         if (!value.config.isSetter)
-                            throw 'Only setter tags can exist outside the fragment';
+                            this.throw('Only setter tags can exist outside the fragment');
                     }
                     else if (value.type !== 'JsE')
-                        throw 'Place tag in fragment';
+                        this.throw('Place tag `' + `${value.type}:${value.loc.start}` + '` in fragment');
                     else if (value.sourceType !== 'script')
-                        throw 'Place tag in fragment';
+                        this.throw('Place tag `' + `${value.type}:${value.loc.start}` + '` in fragment');
                 }
                 if (value.type === 'TextNode') {
                     if (!(0, utilities_1.isEmpty)(value.value))
-                        throw 'Place tag in fragment';
+                        this.throw('Place tag `' + `${value.type}:${value.loc.start}` + '` in fragment');
                 }
                 else if (value.type === 'JsRule' && value.name === 'fragment')
                     this.jsRule = value;
             }
         }
         super.body = value;
+    }
+    get pageComponent() {
+        return this.globalParent.pageComponent;
+    }
+    get basePage() {
+        this.scriptEngine.compileId++;
+        return this.globalParent.basePage;
     }
     compile() {
         //@ts-ignore

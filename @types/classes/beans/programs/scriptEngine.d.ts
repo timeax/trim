@@ -15,6 +15,7 @@ export declare class ScriptEngine extends Element implements TrimRule.ScriptEngi
     set __env(env: TrimRule.env | TrimRule.env[]);
     constructor(props: any);
     set reset(value: boolean);
+    set resetAndCompile(value: boolean);
     lint(): void;
     compile(): string;
     get exportText(): string;

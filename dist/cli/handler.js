@@ -24,6 +24,8 @@ global.avoid = (arg) => {
 };
 global.Fs = utilities_1.Fs;
 global.is = utilities_1.is;
+//---
+process.on('unhandledRejection', err => console.log(err));
 //--------------
 class Actions extends utilities_1.Default {
     constructor(props) {
@@ -91,9 +93,11 @@ class Actions extends utilities_1.Default {
         //--
         const compilers = [];
         const watcher = utilities_1.Fs.watch2(this.path, { ignoreInitial: true });
-        watcher.on('add', (file) => this.compileFolder(compilers, file, 'add'));
-        watcher.on('change', (file) => this.compileFolder(compilers, file, 'change'));
-        watcher.on('unlink', (file) => this.compileFolder(compilers, file, 'delete'));
+        watcher.on('add', (file) => this.compileFolder(compilers, file, 'add')).on('error', (err) => console.log(err));
+        watcher.on('change', (file) => this.compileFolder(compilers, file, 'change')).on('error', (err) => console.log(err));
+        ;
+        watcher.on('unlink', (file) => this.compileFolder(compilers, file, 'delete')).on('error', (err) => console.log(err));
+        ;
         this.watcher = watcher;
         setTimeout(() => this.compileFolder(compilers), 1000);
     }
@@ -223,7 +227,7 @@ class Actions extends utilities_1.Default {
         programs.forEach(program => program.rerun = true);
     }
     set msg(value) {
-        console.log(`${this.stamp} ${value}... \n`);
+        console.log(`${this.stamp} ${value}...\n`);
     }
     set xcache(value) {
         if (utilities_1.Fs.ext(value) === '.js')

@@ -18,7 +18,7 @@ class PageBase extends _1.Program {
     compile() {
         this.clear = true;
         if (this.recompile)
-            this.hasSet = false, this.compileScripts(), this.recompile = false;
+            this.hasSet = false, this.compileScripts();
         if (!this.hasSet)
             this.resolveImportGlobs();
         super.compile();

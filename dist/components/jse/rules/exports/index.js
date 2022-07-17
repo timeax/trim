@@ -26,11 +26,11 @@ class ExportRule extends __1.Compiler {
     run(params = ['']) {
         params = params.map(item => item.trim());
         if (params.length > 2)
-            throw 'Expected 1 or 2 params, found three on export rule';
+            throw `Expected 1 or 2 params, found ${params.length} on export rule`;
         const call = (prop = '') => {
             if (prop.includes('=')) {
                 const [key, value] = prop['split']('=').map(item => item.trim());
-                this[key] = value;
+                this[key] = parser_1.default.isQuote(value.charAt(0)) ? eval(value) : value;
             }
             else if (params.length > 1)
                 throw `Unexpected string '${prop}'`;

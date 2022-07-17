@@ -4,7 +4,7 @@ import { ScriptEngine } from "../../classes/beans/programs/scriptEngine";
 export declare class Scraps extends Program implements TrimRule.Scraps {
     restLoc: string;
     sourceType: 'Scraps';
-    isStrict: false;
+    isStrict: true;
     nodes: TrimRule.Nodemap;
     scriptEngine: ScriptEngine;
     constructor(props: any, options: TrimRule.ScrapsOptions);

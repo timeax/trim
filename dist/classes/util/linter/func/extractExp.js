@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.expressionLinter = void 0;
+const utilities_1 = require("@timeax/utilities");
 const eslint_1 = require("eslint");
 function extractExp(src, linter = new eslint_1.Linter()) {
     let result = [];
@@ -47,7 +48,7 @@ function extractExp(src, linter = new eslint_1.Linter()) {
     return result;
 }
 exports.default = extractExp;
-function expressionLinter(source, linter = new eslint_1.Linter()) {
+function expressionLinter(source, linter = new eslint_1.Linter(), validate = null) {
     const fixTracker = [];
     linter.defineRule('code-checker', {
         meta: {
@@ -60,9 +61,13 @@ function expressionLinter(source, linter = new eslint_1.Linter()) {
             schema: [],
         },
         create: (context) => {
-            function getName(args) {
+            function getName(args, item) {
                 if (args.startsWith('global'))
                     return args;
+                if (!(0, utilities_1.is)(validate).null) {
+                    if (!validate.includes(args))
+                        throw ReferenceError(`${item.name} is not defined`);
+                }
                 return `_$.${args}`;
             }
             function loadExpressions(node, store = []) {
@@ -75,7 +80,7 @@ function expressionLinter(source, linter = new eslint_1.Linter()) {
                             props: {
                                 useRange: false,
                                 node: node,
-                                text: getName(node.name),
+                                text: getName(node.name, node),
                                 //@ts-ignore
                                 range: [node.start, node.end]
                             }
@@ -113,9 +118,8 @@ function expressionLinter(source, linter = new eslint_1.Linter()) {
                         break;
                     case 'TemplateLiteral':
                     case 'SequenceExpression':
-                        for (const obj of node.expressions) {
-                            const arr = loadExpressions(obj, store);
-                        }
+                        for (const obj of node.expressions)
+                            loadExpressions(obj, store);
                         break;
                     case 'LogicalExpression':
                         return logical(node, store, 'LogicalExpression');
@@ -131,6 +135,17 @@ function expressionLinter(source, linter = new eslint_1.Linter()) {
                         return loadExpressions(node.expression, store);
                     case 'UnaryExpression':
                         return loadExpressions(node.argument, store);
+                    // case 'ObjectExpression':
+                    //     const load = (node: Expression, base: Property | SpreadElement) => {
+                    //         if(node.type !== 'FunctionExpression' && node.type == 'ArrowFunctionExpression') loadExpressions(node, store)
+                    //         else {
+                    //         }
+                    //     }
+                    //     node.properties.forEach(prop => {
+                    //         if(prop.type === 'Property') load(prop.value, prop);
+                    //          else load(prop.argument, prop)
+                    //     })
+                    //     break;
                 }
                 return store;
             }

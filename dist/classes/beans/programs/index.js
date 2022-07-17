@@ -71,6 +71,12 @@ class Program extends __1.BaseNode {
         else
             this._imports.push(value);
     }
+    set __imports(value) {
+        if (Array.isArray(value))
+            value.forEach(item => this.__imports = item);
+        else
+            this._imports.push(value);
+    }
     get assets() {
         return this._assets;
     }
@@ -185,6 +191,7 @@ class Program extends __1.BaseNode {
             this.scriptEngine.value = script;
             this.scriptEngine.compileId++;
             this.close();
+            this.recompile = false;
         }
     }
     get pageComponent() {
@@ -199,6 +206,21 @@ class Program extends __1.BaseNode {
         else
             return this.sourceParent.pageComponent;
     }
+    get basePage() {
+        //@ts-ignore
+        if (this.sourceType == 'Page')
+            return this;
+        else {
+            this.scriptEngine.compileId++;
+            //@ts-ignore
+            if ((0, utilities_1.is)(this.sourceParent).null)
+                return { trim: {} };
+            if (this.sourceParent.sourceType == 'Page')
+                return this.sourceParent;
+            else
+                return this.sourceParent.basePage;
+        }
+    }
     get rerun() {
         return this._rerun;
     }
@@ -207,7 +229,7 @@ class Program extends __1.BaseNode {
         if (value) {
             this.trim.rerun();
             if (this.sourceType !== 'Page' && this.sourceType !== 'Export') {
-                this.pageComponent.recompile = true;
+                this.basePage.recompile = true;
             }
             this.rerun = false;
         }

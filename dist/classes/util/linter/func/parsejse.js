@@ -55,6 +55,12 @@ function parseJsE(src, env, linter) {
                     default:
                         if (node.type.includes('Expression'))
                             call(base);
+                        else if (node.type == 'VariableDeclarator') {
+                            if (node.id === base && base.name.startsWith('$'))
+                                __1.default.reportErr(context, node, `TypeError... can't start identifier with dollor sign in JsScript tag...`);
+                            else if (node.init === base)
+                                call(base);
+                        }
                         break;
                 }
             }
@@ -90,28 +96,6 @@ function parseJsE(src, env, linter) {
                     // const type = node.parent.type;
                     // console.log(type, node.name)
                     loadExpressions(node.parent, node, call);
-                    // if (type === 'MemberExpression') {
-                    //     const parent = (() => {
-                    //         let refNode = node.parent;
-                    //         while (refNode.type === 'MemberExpression') {
-                    //             //@ts-ignore
-                    //             if (refNode.parent.type == 'MemberExpression') refNode = refNode.parent;
-                    //             else break;
-                    //         }
-                    //         return refNode;
-                    //     })();
-                    //     if (is(parent).null) return;
-                    //     //@ts-ignore 
-                    //     const [start, main_start] = [node.start, parent.start];
-                    //     if (start === main_start) {
-                    //         call(node);
-                    //     }
-                    // } else {
-                    //     if (node.parent.type == 'AssignmentExpression') {
-                    //         //@ts-ignore
-                    //         call(node);
-                    //     } else if (node.parent.type == 'ExpressionStatement') call(node);
-                    // }
                 }
             };
         }

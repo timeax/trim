@@ -302,7 +302,7 @@ class TrimBaseClass extends utilities_1.Default {
                 return 'Page';
         }
         else
-            throw 'File not found';
+            this.throw('File not found', 'FileNotFound');
     }
     getProgram(name) {
         if (name == 'Page')
@@ -312,7 +312,7 @@ class TrimBaseClass extends utilities_1.Default {
     }
     handle(char, prevChar = '') {
         const { builder, current } = this;
-        let newline = char == null ? false : parser_1.default.isNl(char);
+        let newline = char === null ? false : parser_1.default.isNl(char);
         let whitespace = char == null ? false : parser_1.default.isWs(char);
         let charTrack = char == null && true;
         prevChar = (0, utilities_1.isEmpty)(prevChar) ? '' : prevChar;
@@ -493,13 +493,14 @@ class TrimBaseClass extends utilities_1.Default {
         return null;
     }
     set reset(restart) {
-        restart = (0, utilities_1.is)(restart).null ? false : true;
-        this.line = 1;
         this.__current = null;
+        this.line = 1;
         this.lookout = false;
         this.type = null;
         this.temp = '';
         this.opened = [];
+        this.justClosed = false;
+        this.builder.clear();
         // if (this.component.exports.length > 0) return;
         this.component.closed = !restart;
     }

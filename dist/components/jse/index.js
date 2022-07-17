@@ -14,7 +14,9 @@ class JsE extends jse_1.JsEBase {
     compile() {
         this.clear = true;
         if (this.sourceType == 'expression') {
-            let result = (0, extract_1._call)(this.sourceParent.globals, this.value);
+            this.lint();
+            //----
+            let result = (0, extract_1._call)(this.sourceParent.globals, this.script);
             // console.log(result)
             if (!this.sourceParent.trim.config.compilerOptions.allowNullValues) {
                 if ((0, utilities_1.is)(result).null)
@@ -25,6 +27,7 @@ class JsE extends jse_1.JsEBase {
             this.compiledText = this.compileResult(result);
         }
         else {
+            //--
             const code = this.parseScript();
             (0, extract_1.extractVars)(code, ({ value, key }) => {
                 this.sourceParent.globals[key] = value;

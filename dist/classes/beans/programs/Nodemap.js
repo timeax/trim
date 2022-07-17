@@ -40,6 +40,22 @@ class NodemapBase extends _1.Program {
         //@ts-ignore
         super.body = value;
     }
+    get imports() {
+        return super.imports;
+    }
+    set imports(value) {
+        if (Array.isArray(value))
+            value.forEach(item => this.imports = item);
+        else {
+            if (value.sourceType == 'Scraps') {
+                if (!(0, utilities_1.is)(this.sourceParent).null)
+                    this.sourceParent.imports = value;
+            }
+            else
+                this.throw('Unexpected element');
+        }
+        super.imports = value;
+    }
     handle(char, prevChar = '') {
         const { builder, current } = this.trim;
         let newline = char == null ? false : parser_1.default.isNl(char);
@@ -132,7 +148,7 @@ class NodemapBase extends _1.Program {
             if (self.lookout)
                 current.temp += char;
             if (html) {
-                self.htmlClose(char);
+                self.finaliseNode(char);
                 return false;
             }
             const call = (char, word = null) => {

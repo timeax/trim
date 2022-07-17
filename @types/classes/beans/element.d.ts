@@ -25,6 +25,10 @@ export declare class Parent extends Element implements TrimRule.Parent {
     get name(): string;
     set name(value: string);
     get children(): TrimRule.ChildNodes;
+    childTest(child: any): {
+        msg: string;
+        valid: boolean;
+    };
     set sourceChange(value: TrimRule.Program);
     set children(value: TrimRule.ChildNodes | TrimRule.Tags);
 }

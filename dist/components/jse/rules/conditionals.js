@@ -17,12 +17,25 @@ class Conditions extends _1.Compiler {
         if (this.rule.name !== 'else' && this.rule.name !== 'condition')
             if (params.length > 1 || params.length < 1)
                 throw 'Expected 1 parameter, found ' + params.length;
-        const value = params[0];
-        if (this.rule.name !== 'else' && this.rule.name !== 'condition')
-            this.value = linter_1.default.parseExpression(value).output;
+        this.temp = params[0];
+        const { self } = this;
+        if (this.rule.name === 'condition')
+            this.rule.childTest = function (value) {
+                const obj = { msg: 'success', valid: true };
+                if (value.type !== 'JsRule' || self.valid(value.name))
+                    obj.msg = `Expected '{@case ...}' in {@switch}, found ${value.loc.source}`, obj.valid = false;
+                return obj;
+            };
+    }
+    valid(name) {
+        return name === 'if' || name === 'else' || name === 'elseif';
     }
     compile() {
         const { rule: { self, name } } = this;
+        //--
+        if (name !== 'else' && name !== 'condition')
+            this.value = linter_1.default.parseExpression(this.temp, Object.keys(self.sourceParent.globals)).output;
+        //--
         let text = '';
         switch (name) {
             case 'if':

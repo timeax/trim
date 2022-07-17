@@ -1,42 +1,44 @@
 {
-  "name": "trim",
-  "version": "1.0.0",
-  "description": "Html preprocessor",
-  "main": "dist/index.js",
-  "bin": "dist/cli/index.js",
-  "scripts": {
-    "test": "nodemon dist/test/index"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/timeax/trim.git"
-  },
-  "keywords": [
-    "Html",
-    "preprocessor",
-    "trim"
-  ],
-  "author": "David Okpako",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/timeax/trim/issues"
-  },
-  "homepage": "https://github.com/timeax/trim#readme",
-  "dependencies": {
-    "@timeax/utilities": "^1.0.4",
-    "commander": "^9.3.0",
-    "eslint": "^8.19.0",
-    "glob": "^8.0.3",
-    "glob-array": "^1.0.0",
-    "inquirer": "^8.2.4",
-    "pirates": "^4.0.5",
-    "string-format": "^2.0.0",
-    "trim-lint": "0.0.2",
-    "uuid": "^8.3.2"
-  },
-  "devDependencies": {
-    "@types/eslint": "^8.4.5",
-    "@types/node": "^17.0.45",
-    "@types/uuid": "^8.3.4"
-  }
+    "name": "trim-test",
+    "version": "1.0.0",
+    "description": "Html preprocessor",
+    "main": "dist/index.js",
+    "bin": {
+        "trim": "dist/cli/index.js"
+    },
+    "scripts": {
+        "test": "nodemon dist/test/index"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/timeax/trim.git"
+    },
+    "keywords": [
+        "Html",
+        "preprocessor",
+        "trim"
+    ],
+    "author": "David Okpako",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/timeax/trim/issues"
+    },
+    "homepage": "https://github.com/timeax/trim#readme",
+    "dependencies": {
+        "@timeax/utilities": "^1.0.4",
+        "commander": "^9.3.0",
+        "eslint": "^8.19.0",
+        "glob": "^8.0.3",
+        "glob-array": "^1.0.0",
+        "inquirer": "^8.2.4",
+        "pirates": "^4.0.5",
+        "string-format": "^2.0.0",
+        "trim-lint": "0.0.2",
+        "uuid": "^8.3.2"
+    },
+    "devDependencies": {
+        "@types/eslint": "^8.4.5",
+        "@types/node": "^17.0.45",
+        "@types/uuid": "^8.3.4"
+    }
 }

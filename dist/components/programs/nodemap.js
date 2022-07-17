@@ -40,7 +40,7 @@ class Nodemap extends Nodemap_1.NodemapBase {
         if ((0, utilities_1.is)(this.sourceParent).notNull) {
             this.imports.length = 0;
             this.scriptEngine = engine;
-            this.imports = this.sourceParent.imports;
+            this.__imports = this.sourceParent.imports;
             if (run)
                 this.__globals = this.sourceParent.globals;
         }

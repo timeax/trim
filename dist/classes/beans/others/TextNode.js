@@ -25,7 +25,7 @@ class TextNode extends element_1.Element {
                 this.sourceParent.body.splice(index, 1);
             }
             else if (this.sourceParent.sourceType === 'Export')
-                throw 'Place tag in fragment';
+                this.throw('Place tag `' + `${this.type}:${utilities_1.Fs.name(this.loc.path)}:${this.loc.start.line}` + '` in fragment');
         }
     }
     compile() {

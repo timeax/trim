@@ -49,7 +49,7 @@ class Trim extends classes_1.TrimBaseClass {
         utilities_1.Fs.readChar2(path, (char) => this.handle(char), () => callback());
     }
     parseCurrent(char) {
-        if ((0, utilities_1.is)(this.current).null)
+        if ((0, utilities_1.is)(this.current.type).null)
             return true;
         if (this.current.isClosed)
             return true;
@@ -157,7 +157,7 @@ class Trim extends classes_1.TrimBaseClass {
             if (char == '}' && this.store > 0)
                 current.props += char;
             else if (char == '}') {
-                current.params = current.props.trim().split(',');
+                current.params = current.props.trim().split(',').filter(item => !(0, utilities_1.isEmpty)(item));
                 //@ts-ignore
                 current.isClosed = true;
                 this.justClosed = true;

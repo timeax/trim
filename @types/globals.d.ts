@@ -68,6 +68,7 @@ export declare namespace TrimRule {
         get children(): ChildNodes;
         set children(prop: ChildNodes | Element | Node): void;
         get name(): string;
+        childTest(value: Tags): {msg: string, valid: boolean};
     }
 
     export interface Fragment extends HTML {
@@ -83,7 +84,8 @@ export declare namespace TrimRule {
         name: 'ScriptEngine';
         set env(env: Value | Value[]);
         get env(): env[];
-        set __env(value: env | env[]): void
+        set __env(value: env | env[]): void;
+        set resetAndCompile(value: boolean): void
     }
     export interface env {
         name: string;
@@ -98,6 +100,7 @@ export declare namespace TrimRule {
         compileId: number;
         raw: any;
         preserveText: boolean;
+        script: string;
     }
     export interface HTML extends Parent {
         get type(): 'HTML';
@@ -171,6 +174,7 @@ export declare namespace TrimRule {
         trim: Trim;
         set reset(value: boolean);
         get pageComponent(): Page;
+        get basePage(): Page;
         run(path: string, type: string = ''): void;
     }
 
@@ -244,7 +248,7 @@ export declare namespace TrimRule {
     export interface Scraps extends Programs {
         sourceType: 'Scraps';
         restLoc: string;
-        isStrict: false;
+        isStrict: true;
         nodes: Nodemap;
     }
 

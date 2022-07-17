@@ -7,7 +7,7 @@ class Scraps extends programs_1.Program {
     constructor(props, options) {
         super(props);
         this.sourceType = 'Scraps';
-        this.isStrict = false;
+        this.isStrict = true;
         this.scriptEngine = new scriptEngine_1.ScriptEngine(this);
         this.options = options;
         this.isSet = true;

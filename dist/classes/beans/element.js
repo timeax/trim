@@ -92,6 +92,9 @@ class Parent extends Element {
     get children() {
         return this._children;
     }
+    childTest(child) {
+        return { msg: 'success', valid: true };
+    }
     set sourceChange(value) {
         this.sourceParent = value;
         this.children.forEach(item => item.sourceChange = value);
@@ -101,6 +104,12 @@ class Parent extends Element {
             this._children = value;
         else {
             if (value instanceof _1.BaseNode) {
+                const { msg, valid } = this.childTest(value);
+                if (!valid)
+                    this.throw(msg, 'TypeError');
+                else if (msg === 'ignore')
+                    return;
+                //----
                 if (value.type === 'Script')
                     throw 'Cannot nest scripts';
                 if (this.type == 'HTML' || this.type === 'JsRule') {

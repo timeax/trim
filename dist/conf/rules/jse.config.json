@@ -66,6 +66,21 @@
         "loader": true
     },
     {
+        "name": "switch",
+        "path": "../../components/jse/rules/switch",
+        "isBlock": true
+    },
+    {
+        "name": "case",
+        "path": "../../components/jse/rules/switch",
+        "isBlock": true
+    },
+    {
+        "name": "default",
+        "path": "../../components/jse/rules/switch",
+        "isBlock": true
+    },
+    {
         "name": "props",
         "path": "../../components/jse/rules/props",
         "isBlock": false,

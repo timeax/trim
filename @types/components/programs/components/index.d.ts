@@ -5,6 +5,8 @@ export declare class Component extends ComponentBase implements TrimRule.Compone
     constructor(props?: TrimRule.Trim);
     get body(): TrimRule.ChildNodes | TrimRule.Tags;
     set body(value: TrimRule.ChildNodes | TrimRule.Tags);
+    get pageComponent(): TrimRule.Page;
+    get basePage(): TrimRule.Page;
     compile(): any;
     set exportClose(value: boolean);
 }

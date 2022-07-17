@@ -47,6 +47,7 @@ class Use extends _1.Compiler {
         //---
         if (!(0, utilities_1.is)(imp).null && !(0, utilities_1.is)(def).null)
             exports.push(getObj(def, imp));
+        exports.forEach(item => item.scriptEngine.resetAndCompile = true);
         //@ts-ignore
         this.rule.sourceParent.imports = exports;
     }

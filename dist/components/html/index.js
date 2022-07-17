@@ -47,7 +47,6 @@ class HTML extends index_1.HTMLBase {
         else {
             const close = (prop, rerun = false, letter = char) => {
                 this.attr[prop] = true;
-                console.log('prop ->', prop);
                 if (rerun)
                     this.caller.parseHTML(letter);
             };

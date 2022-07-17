@@ -22,6 +22,7 @@ export declare class Program extends BaseNode implements TrimRule.Programs {
     private _imports;
     get imports(): TrimRule.Imports[];
     set imports(value: Array<TrimRule.Imports> | TrimRule.Imports);
+    set __imports(value: Array<TrimRule.Imports> | TrimRule.Imports);
     private _assets;
     get assets(): string[];
     set assets(value: string | string[]);
@@ -45,6 +46,7 @@ export declare class Program extends BaseNode implements TrimRule.Programs {
     get recompile(): boolean;
     set recompile(value: boolean);
     get pageComponent(): TrimRule.Page;
+    get basePage(): TrimRule.Page;
     private _rerun;
     get rerun(): boolean;
     set rerun(value: boolean);

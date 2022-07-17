@@ -16,6 +16,7 @@ class JsEBase extends element_1.Element {
         this.compileId = 0;
         this.type = 'JsE';
         this.raw = null;
+        this.script = '';
         this.isBlock = false;
     }
     get isClosed() {
@@ -28,7 +29,6 @@ class JsEBase extends element_1.Element {
             if (this.sourceType === 'expression') {
                 if (this.value.startsWith('{') && this.value.endsWith('}'))
                     this.value = `props.${this.value.match(/\w+/g)}`;
-                this.lint();
             }
             else if (this.errorCheck(value))
                 value = true;
@@ -43,7 +43,8 @@ class JsEBase extends element_1.Element {
     }
     lint() {
         const output = linter_1.default.jsxLinter(this.value, { wrapper: 'text', path: this.loc.path });
-        const msg = linter_1.default.parseExpression(output.verify());
+        // console.log(Fs.name(this.loc.path), this.sourceParent.globals, this.sourceParent.type)
+        const msg = linter_1.default.parseExpression(output.verify(), Object.keys(this.sourceParent.globals));
         if (!msg.fixed && msg.messages.length > 0)
             this.throw(`Errors found in JsScript 
             -> [
@@ -51,7 +52,7 @@ class JsEBase extends element_1.Element {
             ];
                 at ${utilities_1.Fs.name(this.loc.path)}
             `);
-        this.value = msg.output;
+        this.script = msg.output;
     }
     parseScript() {
         const script = linter_1.default.parseJsE(this.value, this.sourceParent.scriptEngine.env).verify();

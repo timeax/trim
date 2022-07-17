@@ -3,6 +3,7 @@ import { TrimRule } from '../../../../@types/globals';
 export default class ScrapsRule extends Compiler {
     restLoc: string;
     scraps: TrimRule.Scraps;
+    props: string;
     constructor(props: any);
     run(params: string[]): void;
     close(): void;

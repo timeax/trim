@@ -79,11 +79,20 @@ class ScriptEngine extends element_1.Element {
         if (value) {
             this.script = '';
             this.value = '';
-            this._env = [];
+            this._env = [{ id: 'constant', name: 'props', type: 'const' }];
             this.compileId = 0;
         }
     }
+    set resetAndCompile(value) {
+        if (value) {
+            this.script = '';
+            this._env = [{ id: 'constant', name: 'props', type: 'const' }];
+            this.compileId = 0;
+            this.compile();
+        }
+    }
     lint() {
+        this.compileId++;
         const { env, names, out } = linter_1.default.parseScript(this.value, {
             env: this.env,
             useImports: true,
@@ -105,7 +114,6 @@ class ScriptEngine extends element_1.Element {
                 obj.value = value;
             }
         });
-        this.compileId++;
         return '';
     }
     get exportText() {

@@ -8,6 +8,7 @@ export declare class JsEBase extends Element implements TrimRule.JsE {
     compileId: number;
     type: 'JsE';
     raw: any;
+    script: string;
     get isClosed(): boolean;
     set isClosed(value: boolean);
     errorCheck(value: any): boolean;
