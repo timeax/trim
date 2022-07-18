@@ -482,12 +482,18 @@ class TrimBaseClass extends utilities_1.Default {
     }
     find(node, name) {
         name = name.trim();
-        const rearranged = this.opened.map(item => item).reverse();
+        //@ts-ignore
+        const rearranged = this.opened.map(item => item).reverse().filter(item => item.isBlock);
+        const create = (type, name) => type == 'HTML' ? `<${name} ...>` : `{@${name} ...}`;
         for (const component of rearranged) {
             if (component.type === node) {
-                //@ts-ignore
-                if (component.name === name && component.isBlock)
+                if (component.name === name) {
+                    const index = rearranged.indexOf(component);
+                    if (!(0, utilities_1.is)(rearranged[index - 1]).null)
+                        this.throw(`Expected corresponding closing tag for ${create(rearranged[index - 1].type, rearranged[index - 1].name)}\n\tat ${utilities_1.Fs.name(this.currentPath)}:${this.line}:${this.column - name.length}`);
+                    //@ts-ignore
                     return component;
+                }
             }
         }
         return null;
